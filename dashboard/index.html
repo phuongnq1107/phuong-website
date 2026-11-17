@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard đối tác | EFJ - Kết nối cộng đồng</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/img/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap">
+<link rel="stylesheet" href="/dashboard/dash.css">
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<main id="login" class="login" hidden>
+  <div class="login-card">
+    <img class="login-peng" src="/img/p-shy.webp" alt="" width="94" height="176">
+    <h1>Dashboard đối tác</h1>
+    <p class="muted">EFJ - Kết nối cộng đồng</p>
+    <div class="tabs" role="tablist" aria-label="Loại tài khoản">
+      <button role="tab" id="tabShop" aria-selected="true" aria-controls="formShop" type="button">Quán đối tác</button>
+      <button role="tab" id="tabAdmin" aria-selected="false" aria-controls="formAdmin" type="button">Quản trị viên</button>
+    </div>
+    <form id="formShop" class="lform" role="tabpanel" aria-labelledby="tabShop">
+      <label for="shopCode">Mã truy cập của quán</label>
+      <input id="shopCode" name="code" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH" required>
+      <p class="hint">Mã gồm 8 ký tự do EFJ Group cấp cho từng quán.</p>
+      <button class="btn btn-red" type="submit">Xem số liệu của quán</button>
+    </form>
+    <form id="formAdmin" class="lform" role="tabpanel" aria-labelledby="tabAdmin" hidden>
+      <label for="adminPw">Mật khẩu quản trị</label>
+      <input id="adminPw" name="password" type="password" autocomplete="current-password" required>
+      <button class="btn btn-navy" type="submit">Đăng nhập quản trị</button>
+    </form>
+    <p class="lerr" id="loginErr" role="alert"></p>
+    <a class="back" href="/">Về trang ưu đãi</a>
+  </div>
+</main>
+
+<!-- ================= APP ================= -->
+<div id="app" hidden>
+  <header class="bar">
+    <div class="wrap bar-in">
+      <a class="brand" href="/dashboard"><img src="/img/efj.webp" alt="" width="34" height="32"><span><b>EFJ</b> Dashboard</span></a>
+      <span class="who" id="who"></span>
+      <span class="live" id="live" aria-live="polite"><i></i><span id="liveTxt">Đang kết nối</span></span>
+      <button class="btn btn-line btn-sm" id="logout" type="button">Đăng xuất</button>
+    </div>
+  </header>
+
+  <main class="wrap main">
+    <div class="titlebar">
+      <div>
+        <h1 id="title">Tổng quan chương trình</h1>
+        <p class="muted" id="subtitle"></p>
+      </div>
+      <div class="filters" role="group" aria-label="Khoảng thời gian">
+        <button type="button" data-days="1">Hôm nay</button>
+        <button type="button" data-days="7">7 ngày</button>
+        <button type="button" data-days="30" aria-pressed="true">30 ngày</button>
+        <button type="button" data-days="0">Toàn bộ</button>
+      </div>
+    </div>
+
+    <section class="kpis" id="kpis" aria-label="Chỉ số chính"></section>
+
+    <section class="grid2">
+      <figure class="panel">
+        <figcaption><h2>Lượt quét QR mỗi ngày</h2></figcaption>
+        <div class="chart" id="chartScans"></div>
+      </figure>
+      <figure class="panel">
+        <figcaption><h2>Đăng ký mỗi ngày</h2></figcaption>
+        <div class="chart" id="chartLeads"></div>
+      </figure>
+    </section>
+    <details class="tableview">
+      <summary>Xem số liệu theo ngày dạng bảng</summary>
+      <div class="tbl-wrap"><table id="dailyTable"></table></div>
+    </details>
+
+    <section class="grid2 grid-wide">
+      <div class="panel">
+        <h2>Tiến độ xử lý đăng ký</h2>
+        <div id="pipeline"></div>
+      </div>
+      <div class="panel">
+        <h2>Đăng ký theo dịch vụ</h2>
+        <div id="services"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="myQr" hidden>
+      <div class="qr-in">
+        <img id="myQrImg" alt="Mã QR của quán" width="160" height="160">
+        <div>
+          <h2>Mã QR của quán</h2>
+          <p class="muted">Khách quét mã này sẽ được ghi nhận cho quán của bạn. In mã và đặt ở quầy hoặc trên bàn.</p>
+          <p><code id="myQrUrl"></code></p>
+          <div class="row-acts">
+            <a class="btn btn-navy btn-sm" id="myQrPng" download>Tải mã QR (PNG)</a>
+            <a class="btn btn-line btn-sm" id="myQrSvg" download>Tải poster để in (SVG)</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="shopsPanel" hidden>
+      <div class="panel-head">
+        <h2>75 quán đối tác</h2>
+        <div class="tools">
+          <label class="sel">Tỉnh
+            <select id="fPref"><option value="">Tất cả</option><option>Tokyo</option><option>Kanagawa</option><option>Saitama</option><option>Chiba</option></select>
+          </label>
+          <label class="sel">Tìm quán
+            <input id="fShop" type="search" placeholder="Mã hoặc tên quán">
+          </label>
+          <a class="btn btn-line btn-sm" href="/api/dash/export/access-codes.csv">Tải mã truy cập các quán (CSV)</a>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" id="shopsTable">
+          <thead><tr>
+            <th scope="col"><button type="button" data-sort="code">Mã</button></th>
+            <th scope="col"><button type="button" data-sort="name">Quán</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="scans">Quét QR</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="clicksAll">Bấm ưu đãi</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="leads">Đăng ký</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="won">Ký và bàn giao</button></th>
+            <th scope="col">Tiến độ</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2 id="leadsTitle">Danh sách đăng ký</h2>
+        <div class="tools">
+          <label class="sel">Trạng thái
+            <select id="fStatus"><option value="">Tất cả</option></select>
+          </label>
+          <label class="sel">Dịch vụ
+            <select id="fService"><option value="">Tất cả</option></select>
+          </label>
+          <label class="sel admin-only">Tìm khách
+            <input id="fQ" type="search" placeholder="Tên, điện thoại, email">
+          </label>
+          <a class="btn btn-line btn-sm admin-only" href="/api/dash/export/leads.csv">Tải danh sách (CSV)</a>
+        </div>
+      </div>
+      <p class="muted shop-only small">Vì quyền riêng tư của khách, quán chỉ thấy tên viết tắt và tiến độ tư vấn, không thấy số điện thoại hay email.</p>
+      <div class="tbl-wrap">
+        <table class="tbl" id="leadsTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span id="leadCount" class="muted"></span>
+        <button class="btn btn-line btn-sm" id="more" type="button" hidden>Xem thêm</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- shop drawer (admin) -->
+<dialog id="shopDlg" class="drawer" aria-labelledby="sdTitle">
+  <div class="d-head"><div><h2 id="sdTitle"></h2><p id="sdSub"></p></div><button class="x" type="button" data-close aria-label="Đóng">✕</button></div>
+  <div class="d-body">
+    <section>
+      <h3>Mã truy cập dashboard</h3>
+      <p class="code-big" id="sdCode"></p>
+      <p class="muted small">Gửi mã này cho chủ quán để họ đăng nhập. Đổi mã sẽ đăng xuất quán khỏi mọi thiết bị.</p>
+      <div class="row-acts"><button class="btn btn-line btn-sm" id="sdCopyCode" type="button">Sao chép mã</button><button class="btn btn-line btn-sm" id="sdReset" type="button">Đổi mã mới</button></div>
+    </section>
+    <section>
+      <h3>Mã QR</h3>
+      <div class="qr-in"><img id="sdQr" alt="" width="120" height="120"><div><p><code id="sdUrl"></code></p>
+      <div class="row-acts"><a class="btn btn-navy btn-sm" id="sdPng" download>Tải PNG</a><a class="btn btn-line btn-sm" id="sdSvg" download>Tải poster SVG</a></div></div></div>
+    </section>
+    <form id="sdForm">
+      <h3>Thông tin quán</h3>
+      <label class="f">Tên quán<input name="name" required maxlength="160"></label>
+      <label class="f">Địa chỉ<input name="address" maxlength="255"></label>
+      <div class="f2">
+        <label class="f">Người liên hệ<input name="contact" maxlength="160"></label>
+        <label class="f">Điện thoại<input name="phone" type="tel" maxlength="40"></label>
+      </div>
+      <label class="f">Nhân viên EFJ phụ trách<input name="staff" maxlength="160"></label>
+      <label class="check"><input type="checkbox" name="active"> Đang tham gia chương trình (bỏ chọn để tạm dừng mã QR)</label>
+      <div class="row-acts"><button class="btn btn-red btn-sm" type="submit">Lưu thông tin</button><span class="saved" id="sdSaved" role="status"></span></div>
+    </form>
+  </div>
+</dialog>
+
+<!-- lead drawer (admin) -->
+<dialog id="leadDlg" class="drawer" aria-labelledby="ldTitle">
+  <div class="d-head"><div><h2 id="ldTitle"></h2><p id="ldSub"></p></div><button class="x" type="button" data-close aria-label="Đóng">✕</button></div>
+  <div class="d-body">
+    <dl class="kv" id="ldInfo"></dl>
+    <form id="ldForm">
+      <h3>Xử lý</h3>
+      <label class="f">Trạng thái<select name="status" id="ldStatus"></select></label>
+      <label class="f">Ghi chú nội bộ (quán không xem được)<textarea name="staffNote" rows="4" maxlength="2000"></textarea></label>
+      <div class="row-acts"><button class="btn btn-red btn-sm" type="submit">Lưu</button><span class="saved" id="ldSaved" role="status"></span></div>
+    </form>
+  </div>
+</dialog>
+
+<script src="/dashboard/dash.js" defer></script>
+</body>
+</html>

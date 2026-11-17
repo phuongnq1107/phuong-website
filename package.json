@@ -1,0 +1,25 @@
+{
+  "name": "efj-partner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "EFJ - Kết nối cộng đồng: landing page, QR tracking and partner dashboard",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "qr": "node scripts/generate-qr.js",
+    "codes": "node scripts/export-access-codes.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.2",
+    "express": "^4.22.3",
+    "helmet": "^8.3.0",
+    "mysql2": "^3.24.6",
+    "qrcode": "^1.5.4"
+  }
+}
